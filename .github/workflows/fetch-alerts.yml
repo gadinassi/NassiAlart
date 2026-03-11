@@ -2,8 +2,8 @@ name: Fetch Oref Alerts
 
 on:
   schedule:
-    - cron: '*/5 * * * *'   # כל 5 דקות
-  workflow_dispatch:          # הרצה ידנית
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
 
 jobs:
   fetch:
@@ -15,36 +15,56 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Fetch alerts from Oref (Python)
+      - name: Fetch alerts via proxy
         run: |
           python3 << 'EOF'
           import urllib.request
           import json
           import sys
 
-          url = "https://www.oref.org.il/WarningMessages/History/AlertsHistory.json"
+          OREF_URL = "https://www.oref.org.il/WarningMessages/History/AlertsHistory.json"
+          
+          # Try multiple proxy services
+          proxies = [
+            f"https://api.allorigins.win/raw?url={urllib.parse.quote(OREF_URL)}",
+            f"https://corsproxy.io/?{urllib.parse.quote(OREF_URL)}",
+            f"https://api.codetabs.com/v1/proxy?quest={OREF_URL}",
+            f"https://thingproxy.freeboard.io/fetch/{OREF_URL}",
+          ]
+          
+          import urllib.parse
 
           headers = {
-            "Host": "www.oref.org.il",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "application/json, text/plain, */*",
-            "Accept-Language": "he-IL,he;q=0.9,en-US;q=0.8,en;q=0.7",
-            "Referer": "https://www.oref.org.il/",
-            "X-Requested-With": "XMLHttpRequest",
-            "Connection": "keep-alive",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "application/json, */*",
           }
 
-          req = urllib.request.Request(url, headers=headers)
-          try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
-              raw = resp.read().decode("utf-8-sig")
-              data = json.loads(raw)
-              print(f"Got {len(data)} alerts")
-              with open("alerts.json", "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-          except Exception as e:
-            print(f"Error: {e}", file=sys.stderr)
+          data = None
+          for proxy_url in proxies:
+            try:
+              print(f"Trying: {proxy_url[:60]}...")
+              req = urllib.request.Request(proxy_url, headers=headers)
+              with urllib.request.urlopen(req, timeout=10) as resp:
+                raw = resp.read().decode("utf-8-sig")
+                parsed = json.loads(raw)
+                if isinstance(parsed, list):
+                  data = parsed
+                elif isinstance(parsed, dict) and "contents" in parsed:
+                  data = json.loads(parsed["contents"])
+                if data is not None:
+                  print(f"✅ Success! Got {len(data)} alerts")
+                  break
+            except Exception as e:
+              print(f"  Failed: {e}")
+              continue
+
+          if data is None:
+            print("❌ All proxies failed", file=sys.stderr)
             sys.exit(1)
+
+          with open("alerts.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+          print("Saved alerts.json")
           EOF
 
       - name: Commit and push if changed
