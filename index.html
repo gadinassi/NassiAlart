@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>היסטוריית התראות — רעננה</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #e63946;
+      --red-dark: #b5172a;
+      --red-glow: rgba(230, 57, 70, 0.25);
+      --orange: #f4a261;
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a26;
+      --border: rgba(255,255,255,0.07);
+      --text: #f0f0f5;
+      --text-muted: #7a7a9a;
+      --text-dim: #3a3a5a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Heebo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 80% 20%, rgba(230,57,70,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 20% 80%, rgba(180,30,50,0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: relative;
+      z-index: 1;
+      padding: 40px 48px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .siren-icon {
+      width: 52px;
+      height: 52px;
+      background: var(--red);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 0 30px var(--red-glow), 0 4px 16px rgba(0,0,0,0.4);
+      animation: pulseIcon 3s ease-in-out infinite;
+    }
+
+    @keyframes pulseIcon {
+      0%, 100% { box-shadow: 0 0 30px var(--red-glow), 0 4px 16px rgba(0,0,0,0.4); }
+      50% { box-shadow: 0 0 50px rgba(230,57,70,0.5), 0 4px 16px rgba(0,0,0,0.4); }
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+
+    h1 span {
+      color: var(--red);
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 300;
+      margin-top: 4px;
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(230,57,70,0.12);
+      border: 1px solid rgba(230,57,70,0.3);
+      border-radius: 50px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--red);
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: blink 1.4s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    .main {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+
+    .stat-card:hover { border-color: rgba(230,57,70,0.3); }
+
+    .stat-number {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--red);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-weight: 400;
+    }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 50px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-family: 'Heebo', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn:hover { border-color: var(--red); color: var(--text); }
+    .filter-btn.active { background: var(--red); border-color: var(--red); color: white; font-weight: 600; }
+
+    .search-input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 50px;
+      padding: 8px 20px;
+      font-size: 13px;
+      font-family: 'Heebo', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .search-input:focus { border-color: rgba(230,57,70,0.5); }
+    .search-input::placeholder { color: var(--text-dim); }
+
+    /* Refresh button */
+    .refresh-btn {
+      background: rgba(230,57,70,0.1);
+      border: 1px solid rgba(230,57,70,0.25);
+      color: var(--red);
+      border-radius: 50px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-family: 'Heebo', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .refresh-btn:hover { background: rgba(230,57,70,0.2); }
+    .refresh-btn.spinning .spin-icon { animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Alert list */
+    .alerts-section-title {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+
+    .date-group {
+      margin-bottom: 32px;
+    }
+
+    .date-header {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .date-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .alert-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.2s;
+      animation: slideIn 0.35s ease both;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert-row:hover {
+      border-color: rgba(230,57,70,0.25);
+      background: var(--surface2);
+      transform: translateX(-2px);
+    }
+
+    .alert-time {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--red);
+      font-variant-numeric: tabular-nums;
+      min-width: 56px;
+    }
+
+    .alert-divider {
+      width: 1px;
+      height: 28px;
+      background: var(--border);
+    }
+
+    .alert-cat-icon {
+      font-size: 20px;
+      width: 30px;
+      text-align: center;
+    }
+
+    .alert-info { flex: 1; }
+
+    .alert-area {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .alert-type {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .alert-pill {
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 50px;
+      background: rgba(230,57,70,0.1);
+      color: var(--red);
+      border: 1px solid rgba(230,57,70,0.2);
+      white-space: nowrap;
+    }
+
+    /* Loading & empty states */
+    .loading-state, .empty-state, .error-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-muted);
+    }
+
+    .loading-ring {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    .loading-state p { font-size: 14px; color: var(--text-muted); }
+
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 18px; color: var(--text); margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; }
+
+    .error-icon { font-size: 40px; margin-bottom: 16px; }
+    .error-state h3 { font-size: 18px; color: var(--text); margin-bottom: 8px; }
+    .error-state p { font-size: 13px; }
+
+    /* Last update */
+    .last-update {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 24px 20px; }
+      .stats-bar { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .stat-number { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="siren-icon">🚨</div>
+    <div>
+      <h1>התראות <span>רעננה</span></h1>
+      <div class="subtitle">פיקוד העורף — היסטוריית אזעקות</div>
+    </div>
+  </div>
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    עדכון חי
+  </div>
+</header>
+
+<div class="main">
+
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-card">
+      <div class="stat-number" id="totalCount">—</div>
+      <div class="stat-label">סה״כ התראות</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="todayCount">—</div>
+      <div class="stat-label">היום</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="weekCount">—</div>
+      <div class="stat-label">7 ימים אחרונים</div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setFilter('all', this)">הכל</button>
+    <button class="filter-btn" onclick="setFilter('היום', this)">היום</button>
+    <button class="filter-btn" onclick="setFilter('שבוע', this)">שבוע</button>
+    <button class="filter-btn" onclick="setFilter('חודש', this)">חודש</button>
+    <input class="search-input" type="text" id="searchInput" placeholder="חיפוש לפי איזור או סוג..." oninput="renderAlerts()">
+    <button class="refresh-btn" id="refreshBtn" onclick="loadAlerts()">
+      <span class="spin-icon">↻</span> רענן
+    </button>
+  </div>
+
+  <div class="alerts-section-title">יומן התראות — רעננה והסביבה</div>
+
+  <div id="alertsContainer">
+    <div class="loading-state">
+      <div class="loading-ring"></div>
+      <p>טוען היסטוריית התראות...</p>
+    </div>
+  </div>
+
+  <div class="last-update" id="lastUpdate"></div>
+
+</div>
+
+<script>
+  const CITY_NAMES = ['רעננה'];
+  let allAlerts = [];
+  let activeFilter = 'all';
+
+  const CAT_MAP = {
+    1: { icon: '🚀', label: 'ירי רקטות וטילים' },
+    2: { icon: '✈️', label: 'חדירת כלי טיס עוין' },
+    3: { icon: '📡', label: 'אירוע רדיולוגי' },
+    4: { icon: '☢️', label: 'חומרים מסוכנים' },
+    5: { icon: '🌊', label: 'צונאמי' },
+    6: { icon: '🌍', label: 'רעידת אדמה' },
+    7: { icon: '🔫', label: 'חדירת מחבלים' },
+    13: { icon: '🚀', label: 'ירי בלתי קונבנציונלי' },
+    101: { icon: '⚠️', label: 'תרגיל' },
+  };
+
+  function getCatInfo(cat) {
+    return CAT_MAP[cat] || { icon: '🔔', label: 'התרעה' };
+  }
+
+  function parseDate(dateStr) {
+    // format: "dd.mm.yyyy" or ISO
+    if (!dateStr) return null;
+    if (dateStr.includes('T')) return new Date(dateStr);
+    const [d, m, y] = dateStr.split('.');
+    if (!d || !m || !y) return null;
+    return new Date(`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`);
+  }
+
+  function formatHebrewDate(dateStr) {
+    const d = parseDate(dateStr);
+    if (!d) return dateStr;
+    return d.toLocaleDateString('he-IL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function isToday(dateStr) {
+    const d = parseDate(dateStr);
+    if (!d) return false;
+    const now = new Date();
+    return d.toDateString() === now.toDateString();
+  }
+
+  function isThisWeek(dateStr) {
+    const d = parseDate(dateStr);
+    if (!d) return false;
+    const now = new Date();
+    return (now - d) <= 7 * 24 * 60 * 60 * 1000;
+  }
+
+  function isThisMonth(dateStr) {
+    const d = parseDate(dateStr);
+    if (!d) return false;
+    const now = new Date();
+    return (now - d) <= 30 * 24 * 60 * 60 * 1000;
+  }
+
+  function setFilter(f, btn) {
+    activeFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderAlerts();
+  }
+
+  function getFilteredAlerts() {
+    const search = document.getElementById('searchInput').value.trim().toLowerCase();
+    return allAlerts.filter(a => {
+      const matchCity = CITY_NAMES.some(c => (a.data || '').includes(c));
+      if (!matchCity) return false;
+
+      if (activeFilter === 'היום' && !isToday(a.date)) return false;
+      if (activeFilter === 'שבוע' && !isThisWeek(a.date)) return false;
+      if (activeFilter === 'חודש' && !isThisMonth(a.date)) return false;
+
+      if (search) {
+        const hay = ((a.data || '') + (a.title || '') + (a.date || '') + (a.time || '')).toLowerCase();
+        if (!hay.includes(search)) return false;
+      }
+
+      return true;
+    });
+  }
+
+  function renderAlerts() {
+    const container = document.getElementById('alertsContainer');
+    const filtered = getFilteredAlerts();
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🛡️</div>
+          <h3>אין התראות</h3>
+          <p>לא נמצאו התראות לרעננה בטווח הזמן הנבחר</p>
+        </div>`;
+      return;
+    }
+
+    // Group by date
+    const groups = {};
+    filtered.forEach(a => {
+      const key = a.date || 'לא ידוע';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(a);
+    });
+
+    // Sort dates descending
+    const sortedDates = Object.keys(groups).sort((a, b) => {
+      const da = parseDate(a), db = parseDate(b);
+      if (!da || !db) return 0;
+      return db - da;
+    });
+
+    let html = '';
+    sortedDates.forEach((dateKey, di) => {
+      const label = isToday(dateKey) ? '📅 היום' : formatHebrewDate(dateKey);
+      html += `<div class="date-group">
+        <div class="date-header">${label}</div>`;
+
+      groups[dateKey]
+        .sort((a, b) => (b.time || '').localeCompare(a.time || ''))
+        .forEach((alert, i) => {
+          const cat = getCatInfo(alert.cat);
+          const delay = (di * 3 + i) * 0.04;
+          html += `
+          <div class="alert-row" style="animation-delay:${delay}s">
+            <div class="alert-time">${alert.time || '--:--'}</div>
+            <div class="alert-divider"></div>
+            <div class="alert-cat-icon">${cat.icon}</div>
+            <div class="alert-info">
+              <div class="alert-area">${alert.data || 'לא ידוע'}</div>
+              <div class="alert-type">${alert.title || cat.label}</div>
+            </div>
+            <div class="alert-pill">${cat.label}</div>
+          </div>`;
+        });
+
+      html += '</div>';
+    });
+
+    container.innerHTML = html;
+  }
+
+  function updateStats() {
+    const raananaAlerts = allAlerts.filter(a =>
+      CITY_NAMES.some(c => (a.data || '').includes(c))
+    );
+
+    document.getElementById('totalCount').textContent = raananaAlerts.length;
+    document.getElementById('todayCount').textContent = raananaAlerts.filter(a => isToday(a.date)).length;
+    document.getElementById('weekCount').textContent = raananaAlerts.filter(a => isThisWeek(a.date)).length;
+  }
+
+  async function loadAlerts() {
+    const btn = document.getElementById('refreshBtn');
+    btn.classList.add('spinning');
+    document.getElementById('alertsContainer').innerHTML = `
+      <div class="loading-state">
+        <div class="loading-ring"></div>
+        <p>טוען היסטוריית התראות...</p>
+      </div>`;
+
+    const OREF_URL = 'https://www.oref.org.il/WarningMessages/History/AlertsHistory.json';
+
+    // Try multiple strategies to fetch the data
+    const strategies = [
+      // Strategy 1: Direct with correct Referer (works when opened as local file in Israel)
+      () => fetch(OREF_URL, {
+        method: 'GET',
+        headers: {
+          'Referer': 'https://www.oref.org.il/',
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json, text/plain, */*'
+        }
+      }),
+      // Strategy 2: allorigins.win proxy
+      () => fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(OREF_URL)}`),
+      // Strategy 3: corsproxy.io
+      () => fetch(`https://corsproxy.io/?${encodeURIComponent(OREF_URL)}`),
+      // Strategy 4: cors-anywhere (may require activation)
+      () => fetch(`https://cors-anywhere.herokuapp.com/${OREF_URL}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      }),
+    ];
+
+    let success = false;
+    let lastErr = null;
+
+    for (let i = 0; i < strategies.length; i++) {
+      try {
+        document.getElementById('lastUpdate').textContent = `מנסה שיטה ${i + 1} מתוך ${strategies.length}...`;
+        const resp = await strategies[i]();
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+
+        if (Array.isArray(data) && data.length > 0) {
+          allAlerts = data;
+        } else if (data && Array.isArray(data.alerts)) {
+          allAlerts = data.alerts;
+        } else if (Array.isArray(data) && data.length === 0) {
+          allAlerts = []; // valid empty response
+        } else {
+          throw new Error('תבנית נתונים לא צפויה');
+        }
+
+        updateStats();
+        renderAlerts();
+        const now = new Date();
+        document.getElementById('lastUpdate').textContent =
+          `✅ עדכון אחרון: ${now.toLocaleTimeString('he-IL')} (שיטה ${i + 1})`;
+        success = true;
+        break;
+      } catch (err) {
+        lastErr = err;
+        console.warn(`Strategy ${i + 1} failed:`, err.message);
+      }
+    }
+
+    if (!success) {
+      allAlerts = getDemoData();
+      updateStats();
+      renderAlerts();
+
+      document.getElementById('alertsContainer').insertAdjacentHTML('afterbegin', `
+        <div class="error-state" style="background:rgba(230,57,70,0.06);border:1px solid rgba(230,57,70,0.2);border-radius:12px;padding:20px;margin-bottom:24px;text-align:right;">
+          <div class="error-icon">⚠️</div>
+          <h3>לא ניתן לגשת ל-API</h3>
+          <p style="margin-top:8px;font-size:13px;line-height:1.7">
+            כל 4 השיטות נכשלו. מוצגים נתוני דמו.<br><br>
+            <strong>לפתרון:</strong> פתח את הקובץ ב-Chrome ←
+            <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px">chrome://flags</code>
+            ← חפש <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px">Block insecure private network requests</code>
+            ← Disabled
+          </p>
+        </div>`);
+
+      document.getElementById('lastUpdate').textContent = `שגיאה: ${lastErr?.message || 'לא ידוע'} — מציג נתוני דמו`;
+    }
+
+    btn.classList.remove('spinning');
+  }
+
+  function getDemoData() {
+    const today = new Date();
+    const fmt = (d) => `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+    const yesterday = new Date(today); yesterday.setDate(today.getDate()-1);
+    const twoDaysAgo = new Date(today); twoDaysAgo.setDate(today.getDate()-2);
+    const fiveDaysAgo = new Date(today); fiveDaysAgo.setDate(today.getDate()-5);
+
+    return [
+      { data: 'רעננה', title: 'ירי רקטות וטילים', date: fmt(today), time: '14:22', cat: 1 },
+      { data: 'רעננה', title: 'ירי רקטות וטילים', date: fmt(today), time: '09:05', cat: 1 },
+      { data: 'רעננה', title: 'תרגיל', date: fmt(yesterday), time: '11:00', cat: 101 },
+      { data: 'רעננה', title: 'ירי רקטות וטילים', date: fmt(yesterday), time: '07:30', cat: 1 },
+      { data: 'רעננה', title: 'ירי רקטות וטילים', date: fmt(twoDaysAgo), time: '22:45', cat: 1 },
+      { data: 'רעננה', title: 'ירי רקטות וטילים', date: fmt(twoDaysAgo), time: '20:10', cat: 1 },
+      { data: 'רעננה', title: 'ירי רקטות וטילים', date: fmt(twoDaysAgo), time: '18:33', cat: 1 },
+      { data: 'רעננה', title: 'חדירת כלי טיס עוין', date: fmt(fiveDaysAgo), time: '03:12', cat: 2 },
+      { data: 'רעננה', title: 'ירי רקטות וטילים', date: fmt(fiveDaysAgo), time: '01:50', cat: 1 },
+    ];
+  }
+
+  // Auto-refresh every 60 seconds
+  loadAlerts();
+  setInterval(loadAlerts, 60000);
+</script>
+</body>
+</html>
