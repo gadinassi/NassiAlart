@@ -584,84 +584,43 @@
         <p>טוען היסטוריית התראות...</p>
       </div>`;
 
-    const OREF_URL = 'https://www.oref.org.il/WarningMessages/History/AlertsHistory.json';
+    try {
+      // Fetch alerts.json from same repo — populated every 5min by GitHub Actions
+      const resp = await fetch('./alerts.json?t=' + Date.now());
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
 
-    // Try multiple strategies to fetch the data
-    const strategies = [
-      // Strategy 1: Direct with correct Referer (works when opened as local file in Israel)
-      () => fetch(OREF_URL, {
-        method: 'GET',
-        headers: {
-          'Referer': 'https://www.oref.org.il/',
-          'X-Requested-With': 'XMLHttpRequest',
-          'Accept': 'application/json, text/plain, */*'
-        }
-      }),
-      // Strategy 2: allorigins.win proxy
-      () => fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(OREF_URL)}`),
-      // Strategy 3: corsproxy.io
-      () => fetch(`https://corsproxy.io/?${encodeURIComponent(OREF_URL)}`),
-      // Strategy 4: cors-anywhere (may require activation)
-      () => fetch(`https://cors-anywhere.herokuapp.com/${OREF_URL}`, {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      }),
-    ];
-
-    let success = false;
-    let lastErr = null;
-
-    for (let i = 0; i < strategies.length; i++) {
-      try {
-        document.getElementById('lastUpdate').textContent = `מנסה שיטה ${i + 1} מתוך ${strategies.length}...`;
-        const resp = await strategies[i]();
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const data = await resp.json();
-
-        if (Array.isArray(data) && data.length > 0) {
-          allAlerts = data;
-        } else if (data && Array.isArray(data.alerts)) {
-          allAlerts = data.alerts;
-        } else if (Array.isArray(data) && data.length === 0) {
-          allAlerts = []; // valid empty response
-        } else {
-          throw new Error('תבנית נתונים לא צפויה');
-        }
-
-        updateStats();
-        renderAlerts();
-        const now = new Date();
-        document.getElementById('lastUpdate').textContent =
-          `✅ עדכון אחרון: ${now.toLocaleTimeString('he-IL')} (שיטה ${i + 1})`;
-        success = true;
-        break;
-      } catch (err) {
-        lastErr = err;
-        console.warn(`Strategy ${i + 1} failed:`, err.message);
+      if (Array.isArray(data)) {
+        allAlerts = data;
+      } else if (data && Array.isArray(data.alerts)) {
+        allAlerts = data.alerts;
+      } else {
+        throw new Error('תבנית נתונים לא צפויה');
       }
-    }
 
-    if (!success) {
+      updateStats();
+      renderAlerts();
+      const now = new Date();
+      document.getElementById('lastUpdate').textContent =
+        `✅ עדכון אחרון: ${now.toLocaleTimeString('he-IL')}`;
+
+    } catch (err) {
       allAlerts = getDemoData();
       updateStats();
       renderAlerts();
-
       document.getElementById('alertsContainer').insertAdjacentHTML('afterbegin', `
-        <div class="error-state" style="background:rgba(230,57,70,0.06);border:1px solid rgba(230,57,70,0.2);border-radius:12px;padding:20px;margin-bottom:24px;text-align:right;">
-          <div class="error-icon">⚠️</div>
-          <h3>לא ניתן לגשת ל-API</h3>
-          <p style="margin-top:8px;font-size:13px;line-height:1.7">
-            כל 4 השיטות נכשלו. מוצגים נתוני דמו.<br><br>
-            <strong>לפתרון:</strong> פתח את הקובץ ב-Chrome ←
-            <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px">chrome://flags</code>
-            ← חפש <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px">Block insecure private network requests</code>
-            ← Disabled
+        <div class="error-state" style="background:rgba(244,162,97,0.08);border:1px solid rgba(244,162,97,0.3);border-radius:12px;padding:20px;margin-bottom:24px;text-align:right;">
+          <div class="error-icon">⏳</div>
+          <h3 style="color:#f4a261">ממתין לנתונים ראשונים</h3>
+          <p style="margin-top:8px;font-size:13px;line-height:1.8;color:var(--text-muted)">
+            קובץ alerts.json עוד לא קיים ב-repo.<br>
+            GitHub Actions יצור אותו תוך כמה דקות לאחר הפעלת ה-Workflow.
           </p>
         </div>`);
-
-      document.getElementById('lastUpdate').textContent = `שגיאה: ${lastErr?.message || 'לא ידוע'} — מציג נתוני דמו`;
+      document.getElementById('lastUpdate').textContent = 'מציג נתוני דמו — ממתין ל-GitHub Actions';
     }
 
-    btn.classList.remove('spinning');
+        btn.classList.remove('spinning');
   }
 
   function getDemoData() {
