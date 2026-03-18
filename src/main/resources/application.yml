@@ -1,0 +1,20 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: NASSIaLART
+  thymeleaf:
+    cache: false
+
+app:
+  alert:
+    city: "רעננה"
+    city-aliases:
+      - "רעננה"
+    oref-url: "https://www.oref.org.il/WarningMessages/alert/alerts.json"
+    referer: "https://www.oref.org.il/12481-he/Pakar.aspx"
+    poll-interval-seconds: 5
+    active-alert-retention-seconds: 300
+    connect-timeout-seconds: 5
+    read-timeout-seconds: 5

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#7d0c0c">
+    <title>התראות פיקוד העורף - רעננה</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body th:classappend="${kioskMode} ? ' kiosk-mode' : ''">
+<div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+<main class="app-shell" th:attr="data-kiosk=${kioskMode}">
+    <section class="top-strip">
+        <div class="clock-panel">
+            <span class="top-label">שעה</span>
+            <strong id="liveClock">--:--:--</strong>
+        </div>
+        <div class="holiday-panel" id="holidayPanel">
+            <span class="holiday-icon" id="holidayIcon">🕯️</span>
+            <div>
+                <span class="top-label">מצב שבת וחג</span>
+                <strong id="holidayLabel">כבוי</strong>
+                <span class="holiday-details" id="holidayDetails"></span>
+            </div>
+        </div>
+        <div class="oref-connection" id="orefConnection">
+            <span class="connection-icon" id="connectionIcon"></span>
+            <div>
+                <span class="top-label">מצב מקור נתונים</span>
+                <strong id="connectionLabel">בודק חיבור</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="hero-card" id="heroCard">
+        <div class="status-strip">
+            <span class="live-dot"></span>
+            <span id="statusLabel">מתחבר לשירות</span>
+        </div>
+
+        <div class="hero-content">
+            <p class="eyebrow">פיקוד העורף · תצוגת טאבלט</p>
+            <div class="traffic-light-card" id="trafficLightCard">
+                <div class="traffic-light" id="trafficLight">
+                    <span class="traffic-bulb bulb-red"></span>
+                    <span class="traffic-bulb bulb-yellow"></span>
+                    <span class="traffic-bulb bulb-green"></span>
+                </div>
+                <div class="traffic-copy">
+                    <strong id="trafficLightLabel">טוען מצב רמזור</strong>
+                </div>
+            </div>
+            <h1 id="mainTitle">בודק אם קיימת התרעה ל<span th:text="${cityName}">רעננה</span></h1>
+            <p class="main-desc" id="mainDescription">המסך יראה התרעה אדומה ברגע שתזוהה התרעה רלוונטית לעיר.</p>
+            <p class="instruction" id="mainInstruction">מתבצע polling אוטומטי כל כמה שניות.</p>
+            <div class="alert-timer" id="alertTimer" aria-live="polite">
+                <span class="meta-label">טיימר שהייה במקלט</span>
+                <strong id="alertTimerValue">12:00</strong>
+            </div>
+            <div class="kiosk-last-message" th:if="${kioskMode}">
+                <span class="meta-label">זמן מהודעה אחרונה</span>
+                <strong id="lastAlertElapsedKiosk">-</strong>
+            </div>
+        </div>
+
+        <div class="meta-grid" th:if="${!kioskMode}">
+            <article class="meta-box">
+                <span class="meta-label">קליטה אחרונה</span>
+                <strong id="lastPoll">-</strong>
+            </article>
+            <article class="meta-box">
+                <span class="meta-label">תוקף התרעה</span>
+                <strong id="activeUntil">-</strong>
+            </article>
+            <article class="meta-box">
+                <span class="meta-label">זמן מהודעה אחרונה</span>
+                <strong id="lastAlertElapsed">-</strong>
+            </article>
+        </div>
+    </section>
+
+    <section class="control-card" th:if="${!kioskMode}">
+        <div>
+            <h2>בדיקת מערכת</h2>
+            <p>אם אין כרגע התרעה אמיתית, אפשר להפעיל הדמיה מקומית לצורך בדיקה על הטאבלט.</p>
+        </div>
+        <div class="button-row">
+            <button id="demoButton" type="button">הפעל הדמיית התרעה</button>
+            <button id="clearButton" class="secondary" type="button">נקה הדמיה</button>
+        </div>
+        <p class="source-note" id="sourceMessage">ממתין למצב המערכת.</p>
+    </section>
+
+    <section class="history-card" th:if="${!kioskMode}">
+        <div class="history-header">
+            <div>
+                <p class="eyebrow">היסטוריית התרעות</p>
+                <h2>רעננה לפי שעות</h2>
+                <p class="history-subtitle" id="historySummary">טוען היסטוריה...</p>
+            </div>
+            <div class="history-updated" id="historyUpdatedAt">-</div>
+        </div>
+
+        <div class="history-grid">
+            <article class="chart-panel">
+                <h3>גרף שעות היסטוריות</h3>
+                <div class="hour-chart" id="hourChart"></div>
+            </article>
+            <article class="feed-panel">
+                <h3>התרעות אחרונות ברעננה</h3>
+                <div class="history-feed" id="historyFeed"></div>
+            </article>
+        </div>
+    </section>
+    <section class="kiosk-history-cache" th:if="${kioskMode}" aria-hidden="true">
+        <div id="historySummary"></div>
+        <div id="historyUpdatedAt"></div>
+        <div id="hourChart"></div>
+        <div id="historyFeed"></div>
+    </section>
+</main>
+
+<script src="/js/app.js" defer></script>
+</body>
+</html>
