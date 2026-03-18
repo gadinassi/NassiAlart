@@ -81,3 +81,7 @@ After deployment:
 - add it to the home screen
 - keep the tablet connected to power
 - disable screen sleep if needed
+
+## Deploy Notes
+
+Use Railway `Redeploy` only after GitHub shows the latest commit.
