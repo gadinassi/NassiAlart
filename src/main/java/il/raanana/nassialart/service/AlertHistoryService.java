@@ -6,6 +6,8 @@ import il.raanana.nassialart.model.HistoryAlertItem;
 import il.raanana.nassialart.model.HourlyAlertCount;
 import il.raanana.nassialart.model.OrefHistoryRecord;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,7 @@ import java.util.stream.IntStream;
 @Service
 public class AlertHistoryService {
 
+    private static final Logger log = LoggerFactory.getLogger(AlertHistoryService.class);
     private static final DateTimeFormatter HISTORY_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
     private static final ZoneId ISRAEL_ZONE = ZoneId.of("Asia/Jerusalem");
 
@@ -38,7 +41,11 @@ public class AlertHistoryService {
 
     @PostConstruct
     void initialize() {
-        refresh();
+        try {
+            refresh();
+        } catch (Exception exception) {
+            log.warn("Initial alert history refresh failed. The app will continue and retry later.", exception);
+        }
     }
 
     @Scheduled(fixedDelay = 300000)
@@ -82,7 +89,11 @@ public class AlertHistoryService {
     public AlertHistorySnapshot getHistorySnapshot() {
         CachedHistory cachedHistory = cache.get();
         if (cachedHistory.lastUpdatedAt().plusSeconds(300).isBefore(Instant.now())) {
-            refresh();
+            try {
+                refresh();
+            } catch (Exception exception) {
+                log.warn("On-demand alert history refresh failed. Serving cached history instead.", exception);
+            }
             cachedHistory = cache.get();
         }
         return cachedHistory.snapshot();
